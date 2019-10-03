@@ -1,6 +1,4 @@
 #include "mymalloc.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 #define blockSize 4096
 
@@ -13,7 +11,7 @@ int main(int argv, char* argc[]){
 
 
 
-void* mymalloc(size_t size){
+void* mymalloc(size_t size, char* file, int line){
         if(size<=0){
                 return NULL;
         }else if(size + sizeof(metadata) > blockSize){
