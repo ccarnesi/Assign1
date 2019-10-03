@@ -1,12 +1,11 @@
+#include "mymalloc.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "mymalloc.h"
 
 #define blockSize 4096
 
 int main(int argv, char* argc[]){
-
-
+        malloc(100);
 
         return 0;
 }
@@ -14,14 +13,23 @@ int main(int argv, char* argc[]){
 
 
 
-void* mymalloc(size_t size,char* file_,int line){
+void* mymalloc(size_t size){
         if(size<=0){
                 return NULL;
         }else if(size + sizeof(metadata) > blockSize){
-
+                return NULL;
         }
+        metadata* meta = (metadata*)myblock;
+        if(meta->c != '#'){
+                //first time create sstruct managing block size - metadata size in use 0
+        }else{
+            //iterate till you find metadata that fits for your use
+        }
+
+
+
 }
 
-void myfree(void* ptr, char* file, int line){
+void myfree(void* ptr){
 
 }
