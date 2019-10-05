@@ -1,7 +1,7 @@
 #include "mymalloc.h"
 
 #define blockSize 4096
-
+metadata* breakOff(metadata* prev, int size);
 int main(int argv, char* argc[]){
         malloc(100);
 
@@ -29,7 +29,7 @@ void* mymalloc(size_t size, char* file, int line){
                 second->isManaging = blockSize - 2*sizeof(metadata*) - size;
                 second->prev = meta;
                 second-> next = NULL;
-                return myblock + sizeof(metadata);
+                return myblock + sizeof(metadata) + 1;
 
         }else{
             //iterate till you find metadata that fits for your use
@@ -37,14 +37,31 @@ void* mymalloc(size_t size, char* file, int line){
                         //traverse until you find an unused chunk or the end of meta chain
                         if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(meta)){
                             //found a spot
+                            // break off whats left after the size
+                            metadata* newStruct = breakOff(meta, size);
+                            meta->isManaging = size;
+                            meta->isUsed = 1;
+                            meta->next = newStruct;
+                            return newStruct + sizeof(metadata*) + 1; 
+                        }else if(meta->isUsed ==0 && meta->isManaging>=size){
+                                meta->isUsed =1;
+                                return meta + sizeof(metadata*) + 1;
                         }
                         meta = meta->next;
-                        
                 }
+                return NULL;
                 //At last meta. check size and if not return null
         }
+}
 
-
+metadata* breakOff(metadata* prev, int size){
+    metadata* newStruct = prev + prev->isManaging + 1;
+    int newSize = prev->isManaging - size;
+    newStruct->prev = prev;
+    newStruct->next = NULL;
+    newStruct->isManaging = newSize; 
+    newStruct->isUsed = 0;
+    newStruct->c = '#';
 
 }
 
