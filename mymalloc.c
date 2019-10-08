@@ -2,14 +2,6 @@
 
 #define blockSize 4096
 metadata* breakOff(metadata* prev, int size);
-int main(int argv, char* argc[]){
-        malloc(100);
-
-        return 0;
-}
-
-
-
 
 void* mymalloc(size_t size, char* file, int line){
         if(size<=0){
@@ -42,10 +34,11 @@ void* mymalloc(size_t size, char* file, int line){
                             meta->isManaging = size;
                             meta->isUsed = 1;
                             meta->next = newStruct;
-                            return newStruct + sizeof(metadata*) + 1; 
+                            return (char*)meta + sizeof(metadata*) + 1; 
                         }else if(meta->isUsed ==0 && meta->isManaging>=size){
                                 meta->isUsed =1;
-                                return meta + sizeof(metadata*) + 1;
+                                char* ptr = (char*) meta;
+                                return ptr + sizeof(metadata*) + 1;
                         }
                         meta = meta->next;
                 }
@@ -55,17 +48,19 @@ void* mymalloc(size_t size, char* file, int line){
 }
 
 metadata* breakOff(metadata* prev, int size){
-    metadata* newStruct = prev + prev->isManaging + 1;
+    char* ptr = (char*)prev;
+    metadata* newStruct = prev + size + 1;
     int newSize = prev->isManaging - size;
     newStruct->prev = prev;
     newStruct->next = NULL;
     newStruct->isManaging = newSize; 
     newStruct->isUsed = 0;
     newStruct->c = '#';
+    return newStruct;
 
 }
 
-void myfree(void* ptr){
+void myfree(void* ptr, char* file, int line){
 	/*check if its even a pointer*/
 	metadata * meta = (metadata*) ptr;
 	if(sizeof(ptr)!=sizeof(void*)){
