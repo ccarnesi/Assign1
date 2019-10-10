@@ -3,6 +3,15 @@
 #define blockSize 4096
 metadata* breakOff(metadata* prev, int size);
 
+void main(int argc, char* argv[]){
+        int i;
+        for(i=0;i<100;i++){
+                int* ptr = malloc(1);
+        }
+}
+
+
+
 void* mymalloc(size_t size, char* file, int line){
         if(size<=0){
                 return NULL;
@@ -21,7 +30,7 @@ void* mymalloc(size_t size, char* file, int line){
                 second->isManaging = blockSize - 2*sizeof(metadata*) - size;
                 second->prev = meta;
                 second-> next = NULL;
-                return myblock + sizeof(metadata) + 1;
+                return myblock + sizeof(metadata);
 
         }else{
             //iterate till you find metadata that fits for your use
@@ -34,11 +43,12 @@ void* mymalloc(size_t size, char* file, int line){
                             meta->isManaging = size;
                             meta->isUsed = 1;
                             meta->next = newStruct;
-                            return (char*)meta + sizeof(metadata*) + 1; 
+                            return (char*)meta + sizeof(metadata*); 
                         }else if(meta->isUsed ==0 && meta->isManaging>=size){
                                 meta->isUsed =1;
                                 char* ptr = (char*) meta;
-                                return ptr + sizeof(metadata*) + 1;
+                                return ptr + sizeof(metadata*);
+
                         }
                         meta = meta->next;
                 }

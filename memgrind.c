@@ -57,3 +57,38 @@ void testC(){
                 overhang--;
         }
 }
+void testD(){
+        char* array[50];
+        int overhang = 0;
+        int mallocs = 0;
+        int frees = 0;
+        while(mallocs != 50){
+                int choice = rand() % 1;
+                        if(choice == 0){
+                            //malloc
+                            int size = (rand() % 64) + 1;
+                            array[mallocs] = malloc(size);
+                            mallocs++;
+                            overhang++;
+                        }else{
+                            //free
+                            if(overhang==0){
+                                //malloc
+                                int size = (rand() % 64) + 1;
+                                array[mallocs] = malloc(size);
+                                mallocs++;
+                                overhang++;
+                            }else{
+                                free(array[frees]);
+                                frees++;
+                                overhang--;
+                            }
+                        }
+        }
+        while(overhang!=0){
+            //free the rest
+            free(array[frees]);
+            frees++;
+            overhang--;
+        }
+}
