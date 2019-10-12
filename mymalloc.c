@@ -85,8 +85,10 @@ metadata* breakOff(metadata* prev, int size){
 
 void myfree(void* ptr, char* file, int line){
 	/*check if its even a pointer*/
-	metadata * meta = (metadata*) ptr;
-    char* charPtr = (char*) ptr;
+	char* curr =(char*) ptr-sizeof(metadata*);
+	metadata * meta =(metadata*) curr;
+
+    	char* charPtr = (char*) ptr;
 	if(sizeof(ptr)!=sizeof(void*)){
 		printf("Error: attempting to pass something that isnt a pointer\n");
 		return;
@@ -97,13 +99,31 @@ void myfree(void* ptr, char* file, int line){
 	if(charPtr<myblock||charPtr>(myblock+blockSize)){
 		printf("Error: attempting to access data that is not inside our malloc array \n");
 		return;
-
 	}
 	/*check if this pointer was already freed by checking in use possibly have to fix this in order to account for tthe fact that the pointer leads to the data*/
-	//if(meta->isUsed==0){
-		//printf("Error: attempting to free an already unused block\n");
-		//return;
-	//}
+	if(meta->isUsed==0){
+		printf("Error: attempting to free an already unused block\n");
+		return;
+	}
+	/*I dont think there are any more cases left to check for so we gotta now free the thing and check for stuff*/
+	meta->isUsed = 0;
+	/*if we have someone to the right of us that is also free we must merge with them and become one big happy block, but first we gotta do some edge case checking*/
+	if(blockSize-*curr+sizeof(metadata)-meta->isManaging<=sizeof(metadata)){
+		/*above basically checks if there is a right node available if there isnt that means we are at the end of our block*/
+
+	}else{
+		/*since there is a right block lets check to see if we can merge it in the case its not in use*/
+		if(meta->next->isUsed == 0){
+			/*lets merge so kill the node and its pointers*/
+			metadata * proxima  = meta->next;
+			meta->next = proxima->next;
+			proxima->prev = NULL;
+			meta->isManaging += proxima->isManaging + sizeof(metadata);
+		}
+		/*we don really care about the data so we can just leave it as is since we already sai dits no longer in use*/
+			
+	}
+
 
 }
 
