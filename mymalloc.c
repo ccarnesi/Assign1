@@ -3,19 +3,14 @@
 #define blockSize 4096
 metadata* breakOff(metadata* prev, int size);
 
-void main(int argc, char* argv[]){
-        int i;
-        for(i=0;i<100;i++){
-                int* ptr = malloc(1);
-        }
-}
-
 
 
 void* mymalloc(size_t size, char* file, int line){
         if(size<=0){
+                printf("error: asked for memory of size <=0  in file: %s on line: %d\n", file, line);
                 return NULL;
         }else if(size + sizeof(metadata) > blockSize){
+                printf("error: asked for memory larger than block size in file: %s on line: %d\n", file, line);
                 return NULL;
         }
         metadata* meta = (metadata*)myblock;
@@ -45,6 +40,7 @@ void* mymalloc(size_t size, char* file, int line){
                             meta->next = newStruct;
                             return (char*)meta + sizeof(metadata*); 
                         }else if(meta->isUsed ==0 && meta->isManaging>=size){
+                            //found a spot but no room for anymore meta after
                                 meta->isUsed =1;
                                 char* ptr = (char*) meta;
                                 return ptr + sizeof(metadata*);
@@ -52,8 +48,25 @@ void* mymalloc(size_t size, char* file, int line){
                         }
                         meta = meta->next;
                 }
-                return NULL;
-                //At last meta. check size and if not return null
+                //At last block
+                if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(meta)){
+                        //found a spot
+                        // break off whats left after the size
+                        metadata* newStruct = breakOff(meta, size);
+                        meta->isManaging = size;
+                        meta->isUsed = 1;
+                        meta->next = newStruct;
+                        return (char*)meta + sizeof(metadata*); 
+                    }else if(meta->isUsed ==0 && meta->isManaging>=size){
+                            //found a spot but no room for anymore meta after
+                            meta->isUsed =1;
+                            char* ptr = (char*) meta;
+                            return ptr + sizeof(metadata*);
+
+                    }else{
+                            //couldn't find room
+                            return NULL;
+                    }
         }
 }
 
@@ -73,6 +86,7 @@ metadata* breakOff(metadata* prev, int size){
 void myfree(void* ptr, char* file, int line){
 	/*check if its even a pointer*/
 	metadata * meta = (metadata*) ptr;
+    char* charPtr = (char*) ptr;
 	if(sizeof(ptr)!=sizeof(void*)){
 		printf("Error: attempting to pass something that isnt a pointer\n");
 		return;
@@ -80,16 +94,16 @@ void myfree(void* ptr, char* file, int line){
 	}	
 
 	/* make sure that its something that is inside of our array and not some random pointer THIS IS PROBABLY WRONG*/
-	if(meta>myblock||meta<myblock){
+	if(charPtr<myblock||charPtr>(myblock+blockSize)){
 		printf("Error: attempting to access data that is not inside our malloc array \n");
 		return;
 
 	}
 	/*check if this pointer was already freed by checking in use possibly have to fix this in order to account for tthe fact that the pointer leads to the data*/
-	if(meta->isUsed==0){
-		printf("Error: attempting to free an already unused block\n");
-		return;
-	}
+	//if(meta->isUsed==0){
+		//printf("Error: attempting to free an already unused block\n");
+		//return;
+	//}
 
 }
 
