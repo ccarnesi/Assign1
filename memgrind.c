@@ -199,11 +199,12 @@ void testF(){
 	int i=0;
 	int j =0;
 	int k =0;
+	int mallocs = 0;
 	for(i =0;i<100;i++){
 		char* array[32];	
 		int mallocs =0;
 		/*at capacity test*/
-		for(;mallocs<32;j++){
+		for(;mallocs<32;mallocs++){
 			array[mallocs] = (char*) malloc(96);
 
 		}
@@ -214,7 +215,7 @@ void testF(){
 			free(&lol+k);
 		}
 		/*making the array empty minus the structs that were there*/
-		for(j=0;i<32;j++){
+		for(j=0;j<32;j++){
 			free(array[j]);
 		}
 		free((void*)lol);

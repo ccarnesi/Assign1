@@ -25,6 +25,8 @@ void* mymalloc(size_t size, char* file, int line){
                 second->isManaging = blockSize - 2*sizeof(metadata*) - size;
                 second->prev = meta;
                 second-> next = NULL;
+		meta->c = '#';
+		second->c = '#';
                 return myblock + sizeof(metadata);
 
         }else{
@@ -85,20 +87,13 @@ metadata* breakOff(metadata* prev, int size){
 
 void myfree(void* ptr, char* file, int line){
     	char* charPtr = (char*) ptr;
-	/*pretty sure this will always eval as ==  bc we're type casting it lol*/
-	if(sizeof(ptr)!=sizeof(void*)){
-		printf("Error: attempting to pass something that isnt a pointer in file: %s, on line %d\n",file,line);
-		return;			
-	}	
-
-	/* make sure that its something that is inside of our array and not some random pointer THIS IS PROBABLY WRONG*/
+	/* make sure that its something that is inside of our array and not some random location, we do this by comparing the memory address of our pointer vs the memory of our array*/
 	if(charPtr<myblock||charPtr>(myblock+blockSize)){
 		printf("Error: attempting to access data that is not inside our malloc array in file: %s, on line %d\n",file,line);
 		return;
 	}	
 	char* curr =(char*) ptr-sizeof(metadata*);
 	metadata * meta =(metadata*) curr;
-
 	/*check to see if the pointer actually points to a *metadata struct*/
 	if(meta->c != '#'){
 		printf("Error:freeing before the array is even made or not a valid pointer to the array in file: %s, on line %d\n",file, line);
@@ -113,8 +108,7 @@ void myfree(void* ptr, char* file, int line){
 	/*I dont think there are any more cases left to check for so we gotta now free the thing and check for stuff*/
 	meta->isUsed = 0;
 	/*if we have someone to the right of us that is also free we must merge with them and become one big happy block, but first we gotta do some edge case checking*/
-	if(blockSize-*curr+sizeof(metadata)-meta->isManaging<=sizeof(metadata)){
-		/*above basically checks if there is a right node available if there isnt that means we are at the end of our block NOTE: there could still be some little dudes out here just chillin so lets add em to managing*/
+	if(meta->next != NULL){
 			
 	}else{
 		/*since there is a right block lets check to see if we can merge it in the case its not in use*/
@@ -124,15 +118,24 @@ void myfree(void* ptr, char* file, int line){
 			meta->next = proxima->next;
 			proxima->prev = NULL;
 			meta->isManaging += proxima->isManaging + sizeof(metadata);
+			printf("Success, freed spot at %p\n",(void *)curr);
 		}
-		/*we don really care about the data so we can just leave it as is since we already sai dits no longer in use*/
-			
 	}
+	/*just make sure we arent at first block*/ 
+	if(meta->prev != NULL){
+		if(meta->prev->isUsed==0){
+			/*merge the left as well*/
+			metadata* antes = meta->prev;
+			/*we are able to link our right cuz we arent at the end*/
+			antes->next = meta->next;
+			antes->isManaging += meta->isManaging +sizeof(metadata);
+			printf("mem to left was also free so we merged\n");
+		}
+		/*we don really care about the data so we can just leave it as is since we already said its no longer in use*/
 
+	}
+	return;
 
-}
-void main(int argc, char** argv){
-	printf("%d",sizeof(metadata));
 
 }
 
