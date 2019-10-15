@@ -26,22 +26,23 @@ void* mymalloc(size_t size, char* file, int line){
                 second->isManaging = blockSize - 2*sizeof(metadata) - size;
                 second->prev = meta;
                 second-> next = NULL;
-		meta->c = '#';
-		second->c = '#';
-                return myblock + sizeof(metadata*);
+		        meta->c = '#';
+		        second->c = '#';
+                return myblock + sizeof(metadata);
 
         }else{
             //iterate till you find metadata that fits for your use
                 while(meta->next != NULL){
                         //traverse until you find an unused chunk or the end of meta chain
-                        if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(meta)){
+                        if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(metadata)){
                             //found a spot
                             // break off whats left after the size
                             metadata* newStruct = breakOff(meta, size);
                             meta->isManaging = size;
                             meta->isUsed = 1;
                             meta->next = newStruct;
-                            return (char*)meta + sizeof(metadata); 
+                            char* ptr = (char*) meta;
+                            return ptr + sizeof(metadata); 
                         }else if(meta->isUsed ==0 && meta->isManaging>=size){
                             //found a spot but no room for anymore meta after
                                 meta->isUsed =1;
@@ -52,9 +53,10 @@ void* mymalloc(size_t size, char* file, int line){
                         meta = meta->next;
                 }
                 //At last block
-                if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(meta)){
+                if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(metadata)){
                         //found a spot
                         // break off whats left after the size
+                        printf("HEREi\n");
                         metadata* newStruct = breakOff(meta, size);
                         meta->isManaging = size;
                         meta->isUsed = 1;
@@ -75,10 +77,10 @@ void* mymalloc(size_t size, char* file, int line){
 
 metadata* breakOff(metadata* prev, int size){
     char* ptr = (char*)prev;
-    metadata* newStruct = prev + size + 1;
+    metadata* newStruct = (metadata*)ptr + sizeof(metadata)  + size;
     int newSize = prev->isManaging - size;
     newStruct->prev = prev;
-    newStruct->next = NULL;
+    newStruct->next = prev->next;
     newStruct->isManaging = newSize; 
     newStruct->isUsed = 0;
     newStruct->c = '#';

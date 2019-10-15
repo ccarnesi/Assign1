@@ -11,12 +11,12 @@ void testE();
 void testF();
 
 int main(int argv, char* argc[]){
-    testA();
+    //testA();
     testB();
-    testC();
-    testD();
-    testE();
-    testF();
+    //testC();
+    //testD();
+    //testE();
+    //testF();
 }
 
 
