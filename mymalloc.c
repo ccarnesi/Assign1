@@ -33,6 +33,7 @@ void* mymalloc(size_t size, char* file, int line){
         }else{
             //iterate till you find metadata that fits for your use
                 while(meta->next != NULL){
+                        printf("next:%p\n", meta);
                         //traverse until you find an unused chunk or the end of meta chain
                         if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(metadata)){
                             //found a spot
@@ -41,15 +42,16 @@ void* mymalloc(size_t size, char* file, int line){
                             meta->isManaging = size;
                             meta->isUsed = 1;
                             meta->next = newStruct;
+                            meta->next->prev = newStruct;
                             char* ptr = (char*) meta;
                             return ptr + sizeof(metadata); 
-                        }else if(meta->isUsed ==0 && meta->isManaging>=size){
+                        }//else if(meta->isUsed ==0 && meta->isManaging>=size){
                             //found a spot but no room for anymore meta after
-                                meta->isUsed =1;
-                                char* ptr = (char*) meta;
-                                return ptr + sizeof(metadata);
+                           //     meta->isUsed =1;
+                             //   char* ptr = (char*) meta;
+                               // return ptr + sizeof(metadata);
 
-                        }
+                       // }
                         meta = meta->next;
                 }
                 //At last block
@@ -122,9 +124,9 @@ void myfree(void* ptr, char* file, int line){
 			proxima->prev = NULL;
 			meta->isManaging += proxima->isManaging + sizeof(metadata);
             if(proxima->next!=NULL){
-                if(proxima->next->prev!=NULL){
+                //if(proxima->next->prev!=NULL){
                         proxima->next->prev = meta;
-                }
+                //}
             }
 
 		}
