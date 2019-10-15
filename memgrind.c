@@ -7,12 +7,16 @@ void testA();
 void testB();
 void testC();
 void testD();
+void testE();
+void testF();
 
 int main(int argv, char* argc[]){
     testA();
     testB();
     testC();
     testD();
+    testE();
+    testF();
 }
 
 
@@ -153,6 +157,84 @@ void testD(){
     }
     findAvg("Test D", timeArray);
 }
+/*this plan tests how well our malloc calls work when we are at capacity then freeing that capacity*/
+void testE(){
+	long timeArray[100];
+	struct timeval start, end;
+	int j;
+	int mallocs = 0;
+	for(j=0;j<100;j++){
+		gettimeofday(&start,NULL);
+		char* array[32];
+		/*malloc till capacity*/
+		for(;mallocs<32;mallocs++){
+		array[mallocs] = (char*) malloc(96);		
+		}
+		/*now mess around with the last data block over and over again having enough space for a meta datablock at end and then without*/
+		int i =0;
+		for(i =0;i<50;i++){
+		free(array[31]);
+		array[31] = (char*) malloc(63);
+		free(array[31]);
+		array[31] = (char*) malloc(64);
+		free(array[31]);
+		}
+		for(i =0;i<31;i++){
+			free(array[j]);
+		}
+		gettimeofday(&end,NULL);
+		long seconds = (end.tv_sec-start.tv_sec);
+		timeArray[j] = ((seconds*1000000)+end.tv_usec)-(start.tv_usec);
+	}
+	
+	findAvg("Test E", timeArray);
+}
+/*this plan tests how well free works against valid and non valid pointers*/
+void testF(){
+	long timeArray[100];
+	struct timeval start, end;
+	int nice = 69;
+	int *lol = &nice;
+	char *meep = "meep";
+	int i=0;
+	int j =0;
+	int k =0;
+	for(i =0;i<100;i++){
+		char* array[32];	
+		int mallocs =0;
+		/*at capacity test*/
+		for(;mallocs<32;j++){
+			array[mallocs] = (char*) malloc(96);
+
+		}
+		free((void*)lol);
+		free((void*)meep);
+		for(k=0;k<10;k++){
+			free(array[k]+k);
+			free(&lol+k);
+			free(nice+k);
+		}
+		/*making the array empty minus the structs that were there*/
+		for(j=0;i<32;j++){
+			free(array[j]);
+		}
+		free((void*)lol);
+		free((void*)meep);
+		for(k=0;k<10;k++){
+			free(array[k]+k);
+			free(&lol+k);
+		}
+
+		gettimeofday(&end,NULL);
+		long seconds = (end.tv_sec-start.tv_sec);
+		timeArray[j] = ((seconds*1000000)+end.tv_usec)-(start.tv_usec);
+	}	
+	findAvg("Test F", timeArray);
+	
+
+}
+
+
 void findAvg(char* testName, long array[]){
         int i;
         long sum = 0;

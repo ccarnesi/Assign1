@@ -84,33 +84,38 @@ metadata* breakOff(metadata* prev, int size){
 }
 
 void myfree(void* ptr, char* file, int line){
-	/*check if its even a pointer*/
-	char* curr =(char*) ptr-sizeof(metadata*);
-	metadata * meta =(metadata*) curr;
-
     	char* charPtr = (char*) ptr;
+	/*pretty sure this will always eval as ==  bc we're type casting it lol*/
 	if(sizeof(ptr)!=sizeof(void*)){
-		printf("Error: attempting to pass something that isnt a pointer\n");
-		return;
-			
+		printf("Error: attempting to pass something that isnt a pointer in file: %s, on line %d\n",file,line);
+		return;			
 	}	
 
 	/* make sure that its something that is inside of our array and not some random pointer THIS IS PROBABLY WRONG*/
 	if(charPtr<myblock||charPtr>(myblock+blockSize)){
-		printf("Error: attempting to access data that is not inside our malloc array \n");
+		printf("Error: attempting to access data that is not inside our malloc array in file: %s, on line %d\n",file,line);
+		return;
+	}	
+	char* curr =(char*) ptr-sizeof(metadata*);
+	metadata * meta =(metadata*) curr;
+
+	/*check to see if the pointer actually points to a *metadata struct*/
+	if(meta->c != '#'){
+		printf("Error:freeing before the array is even made or not a valid pointer to the array in file: %s, on line %d\n",file, line);
 		return;
 	}
+	
 	/*check if this pointer was already freed by checking in use possibly have to fix this in order to account for tthe fact that the pointer leads to the data*/
 	if(meta->isUsed==0){
-		printf("Error: attempting to free an already unused block\n");
+		printf("Error: attempting to free an already unused block\n in file: %s, on line %d\n",file, line);
 		return;
 	}
 	/*I dont think there are any more cases left to check for so we gotta now free the thing and check for stuff*/
 	meta->isUsed = 0;
 	/*if we have someone to the right of us that is also free we must merge with them and become one big happy block, but first we gotta do some edge case checking*/
 	if(blockSize-*curr+sizeof(metadata)-meta->isManaging<=sizeof(metadata)){
-		/*above basically checks if there is a right node available if there isnt that means we are at the end of our block*/
-
+		/*above basically checks if there is a right node available if there isnt that means we are at the end of our block NOTE: there could still be some little dudes out here just chillin so lets add em to managing*/
+			
 	}else{
 		/*since there is a right block lets check to see if we can merge it in the case its not in use*/
 		if(meta->next->isUsed == 0){
@@ -124,6 +129,10 @@ void myfree(void* ptr, char* file, int line){
 			
 	}
 
+
+}
+void main(int argc, char** argv){
+	printf("%d",sizeof(metadata));
 
 }
 

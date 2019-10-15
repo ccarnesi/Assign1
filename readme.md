@@ -10,7 +10,7 @@ When mymalloc is called it will check to see if it is the first time it has been
 
 free:
 **JC PART**
-
+When free is called, first we must check to see whether the pointer given to us is even valid. In order to make sure that its a pointer we compared the sizeof("pointer") to the size of an actual void*. Furthermore, we have to check to make sure that the pointer is somewhere in our valid malloc. As a last check we also have to make sure that the pointer is actually pointing to some valid metadatablock and not some random piece of data. In order to accomplish this, we must see if our pointer->c has the value of our hashtag. If it doe sthen we are ready to free our pointer. As one last edge case we make sure that the pointer is in use and not in use or else we would be freeing already freed memory. Now for the freeing process we change the value of pointer->isUsed to 0 to indicate it has been freed and if there is a node to the right that is also free then we merge the two nodes together into one. If all goes well we just return our 0 else we return -1.
 Average Run Times:
 Implement this in memgrind
 
