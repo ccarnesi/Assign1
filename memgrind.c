@@ -212,7 +212,6 @@ void testF(){
 		for(k=0;k<10;k++){
 			free(array[k]+k);
 			free(&lol+k);
-			free(nice+k);
 		}
 		/*making the array empty minus the structs that were there*/
 		for(j=0;i<32;j++){
