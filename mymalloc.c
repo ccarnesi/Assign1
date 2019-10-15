@@ -56,7 +56,6 @@ void* mymalloc(size_t size, char* file, int line){
                 if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(metadata)){
                         //found a spot
                         // break off whats left after the size
-                        printf("HEREi\n");
                         metadata* newStruct = breakOff(meta, size);
                         meta->isManaging = size;
                         meta->isUsed = 1;
@@ -122,7 +121,14 @@ void myfree(void* ptr, char* file, int line){
 			meta->next = proxima->next;
 			proxima->prev = NULL;
 			meta->isManaging += proxima->isManaging + sizeof(metadata);
+            if(proxima->next!=NULL){
+                if(proxima->next->prev!=NULL){
+                        proxima->next->prev = meta;
+                }
+            }
+
 		}
+        
 	}
 	/*just make sure we arent at first block*/ 
 	if(meta->prev != NULL){
@@ -132,7 +138,9 @@ void myfree(void* ptr, char* file, int line){
 			/*we are able to link our right cuz we arent at the end*/
 			antes->next = meta->next;
 			antes->isManaging += meta->isManaging +sizeof(metadata);
-			printf("mem to left was also free so we merged\n");
+            if(meta->next != NULL){
+                    meta->next->prev = antes;
+            }
 		}
 		/*we don really care about the data so we can just leave it as is since we already said its no longer in use*/
 

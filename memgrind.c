@@ -48,19 +48,16 @@ void testB(){
     int k;
     for(l=0;l<100;l++){
         gettimeofday(&start, NULL);
-        char* array[50];
         int j;
 
         for(j=0;j<3;j++){
-            printf("startJ:%d\n", j);
+            char* array[50];
             for(i=0;i<50;i++){
                 array[i] = malloc(1);
             }   
-            printf("Done mallocing\n");
             for(k=0;k<50;k++){
                 free(array[k]);
             }
-            printf("J:%d\n", j);
         }
 
         gettimeofday(&end, NULL);
