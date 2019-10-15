@@ -61,7 +61,8 @@ void* mymalloc(size_t size, char* file, int line){
                         meta->isManaging = size;
                         meta->isUsed = 1;
                         meta->next = newStruct;
-                        return (char*)meta + sizeof(metadata); 
+                        char* ptr = (char*)meta;
+                        return ptr + sizeof(metadata); 
                     }else if(meta->isUsed ==0 && meta->isManaging>=size){
                             //found a spot but no room for anymore meta after
                             meta->isUsed =1;
@@ -76,8 +77,8 @@ void* mymalloc(size_t size, char* file, int line){
 }
 
 metadata* breakOff(metadata* prev, int size){
-    char* ptr = (char*)prev;
-    metadata* newStruct = (metadata*)ptr + sizeof(metadata)  + size;
+    char* ptr = (char*)prev + sizeof(metadata)+ size;
+    metadata* newStruct = (metadata*)ptr;
     int newSize = prev->isManaging - size;
     newStruct->prev = prev;
     newStruct->next = prev->next;
