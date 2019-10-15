@@ -19,11 +19,11 @@ void* mymalloc(size_t size, char* file, int line){
                 meta->isUsed = 1;
                 meta->isManaging = size;
                 meta->prev = NULL;
-                char* ptr = myblock + sizeof(metadata*) + size;
+                char* ptr = myblock + sizeof(metadata) + size;
                 metadata* second = (metadata*)ptr; //this should be the second meta that manages the rest of data
                 meta->next = second;
                 second->isUsed = 0;
-                second->isManaging = blockSize - 2*sizeof(metadata*) - size;
+                second->isManaging = blockSize - 2*sizeof(metadata) - size;
                 second->prev = meta;
                 second-> next = NULL;
 		meta->c = '#';
@@ -41,12 +41,12 @@ void* mymalloc(size_t size, char* file, int line){
                             meta->isManaging = size;
                             meta->isUsed = 1;
                             meta->next = newStruct;
-                            return (char*)meta + sizeof(metadata*); 
+                            return (char*)meta + sizeof(metadata); 
                         }else if(meta->isUsed ==0 && meta->isManaging>=size){
                             //found a spot but no room for anymore meta after
                                 meta->isUsed =1;
                                 char* ptr = (char*) meta;
-                                return ptr + sizeof(metadata*);
+                                return ptr + sizeof(metadata);
 
                         }
                         meta = meta->next;
@@ -59,12 +59,12 @@ void* mymalloc(size_t size, char* file, int line){
                         meta->isManaging = size;
                         meta->isUsed = 1;
                         meta->next = newStruct;
-                        return (char*)meta + sizeof(metadata*); 
+                        return (char*)meta + sizeof(metadata); 
                     }else if(meta->isUsed ==0 && meta->isManaging>=size){
                             //found a spot but no room for anymore meta after
                             meta->isUsed =1;
                             char* ptr = (char*) meta;
-                            return ptr + sizeof(metadata*);
+                            return ptr + sizeof(metadata);
 
                     }else{
                             //couldn't find room
@@ -93,7 +93,7 @@ void myfree(void* ptr, char* file, int line){
 		printf("Error: attempting to access data that is not inside our malloc array in file: %s, on line %d\n",file,line);
 		return;
 	}	
-	char* curr =(char*) ptr-sizeof(metadata*);
+	char* curr =(char*) charPtr-sizeof(metadata);
 	metadata * meta =(metadata*) curr;
 	/*check to see if the pointer actually points to a *metadata struct*/
 	if(meta->c != '#'){
@@ -119,7 +119,6 @@ void myfree(void* ptr, char* file, int line){
 			meta->next = proxima->next;
 			proxima->prev = NULL;
 			meta->isManaging += proxima->isManaging + sizeof(metadata);
-			printf("Success, freed spot at %p\n",(void *)curr);
 		}
 	}
 	/*just make sure we arent at first block*/ 
