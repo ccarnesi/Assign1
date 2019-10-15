@@ -2,6 +2,7 @@
 #include <sys/time.h>
 
 
+
 void findAvg(char* testName, long array[]);
 void testA();
 void testB();
@@ -11,9 +12,10 @@ void testE();
 void testF();
 
 int main(int argv, char* argc[]){
-    //testA();
+    srand(123);
+    testA();
     testB();
-    //testC();
+    testC();
     //testD();
     //testE();
     //testF();
@@ -77,31 +79,37 @@ void testC(){
             char* array[50];
             int mallocPtr = 0;
             int freePtr = 0;
-            while(mallocPtr != 50){
+            printf("J:%d\n", j);
+            while(mallocPtr < 50){
                     int num = rand() % 2;
                     if(num ==0){
                             //malloc
+                            printf("mallocPtr: %d\n", mallocPtr);
                             array[mallocPtr] = malloc(1);
-                            mallocPtr++;
-                            overhang++;
+                            ++mallocPtr;
+                            ++overhang;
                     }else{
                             //free
                             if(overhang == 0){
                                     //malloc
                                     array[mallocPtr] = malloc(1);
-                                    mallocPtr++;
-                                    overhang++;
+                                    ++mallocPtr;
+                                    ++overhang;
                             }else{
                                 free(array[freePtr]); 
-                                freePtr++;
-                                overhang--;
+                                ++freePtr;
+                                --overhang;
                             }
                     }
+                    printf("mallocs:%d\n", mallocPtr);
+                    printf("overhang%d\n", overhang);
+
             }
-            while(overhang != 0){
+            printf("OVER:%d\n", overhang);
+            while(overhang > 0){
                     free(array[freePtr]); 
-                    freePtr++;
-                    overhang--;
+                    ++freePtr;
+                    --overhang;
             }
             gettimeofday(&end, NULL);
             long seconds = (end.tv_sec - start.tv_sec);
