@@ -13,11 +13,11 @@ void testF();
 
 int main(int argv, char* argc[]){
     srand(123);
-    testA();
-    testB();
-    testC();
-    //testD();
-    //testE();
+  //  testA();
+   // testB();
+    //testC();
+   // testD();
+    testE();
     //testF();
 }
 
@@ -79,12 +79,12 @@ void testC(){
             char* array[50];
             int mallocPtr = 0;
             int freePtr = 0;
-            printf("J:%d\n", j);
+            //printf("J:%d\n", j);
             while(mallocPtr < 50){
                     int num = rand() % 2;
                     if(num ==0){
                             //malloc
-                            printf("mallocPtr: %d\n", mallocPtr);
+                            //printf("mallocPtr: %d\n", mallocPtr);
                             array[mallocPtr] = malloc(1);
                             ++mallocPtr;
                             ++overhang;
@@ -101,11 +101,11 @@ void testC(){
                                 --overhang;
                             }
                     }
-                    printf("mallocs:%d\n", mallocPtr);
-                    printf("overhang%d\n", overhang);
+                    //printf("mallocs:%d\n", mallocPtr);
+                    //printf("overhang%d\n", overhang);
 
             }
-            printf("OVER:%d\n", overhang);
+            //printf("OVER:%d\n", overhang);
             while(overhang > 0){
                     free(array[freePtr]); 
                     ++freePtr;
@@ -177,6 +177,7 @@ void testE(){
 		for(;mallocs<32;mallocs++){
 		array[mallocs] = (char*) malloc(96);		
 		}
+		printf("fully filled array \n");
 		/*now mess around with the last data block over and over again having enough space for a meta datablock at end and then without*/
 		int i =0;
 		for(i =0;i<50;i++){
@@ -187,7 +188,7 @@ void testE(){
 		free(array[31]);
 		}
 		for(i =0;i<31;i++){
-			free(array[j]);
+			free(array[i]);
 		}
 		gettimeofday(&end,NULL);
 		long seconds = (end.tv_sec-start.tv_sec);

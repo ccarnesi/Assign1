@@ -35,14 +35,14 @@ void* mymalloc(size_t size, char* file, int line){
                 while(meta->next != NULL){
                         printf("next:%p\n", meta);
                         //traverse until you find an unused chunk or the end of meta chain
-                        if(meta->isUsed == 0 && meta->isManaging >= size + sizeof(metadata)){
+                        if(meta->isUsed == 0 && meta->isManaging > size + sizeof(metadata)){
                             //found a spot
                             // break off whats left after the size
                             metadata* newStruct = breakOff(meta, size);
                             meta->isManaging = size;
                             meta->isUsed = 1;
+			    meta->next->prev = newStruct;
                             meta->next = newStruct;
-                            meta->next->prev = newStruct;
                             char* ptr = (char*) meta;
                             return ptr + sizeof(metadata); 
                         }//else if(meta->isUsed ==0 && meta->isManaging>=size){
@@ -80,7 +80,7 @@ void* mymalloc(size_t size, char* file, int line){
 metadata* breakOff(metadata* prev, int size){
     char* ptr = (char*)prev + sizeof(metadata)+ size;
     metadata* newStruct = (metadata*)ptr;
-    int newSize = prev->isManaging - size;
+    int newSize = prev->isManaging - size-sizeof(metadata);
     newStruct->prev = prev;
     newStruct->next = prev->next;
     newStruct->isManaging = newSize; 
