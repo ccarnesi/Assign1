@@ -33,7 +33,7 @@ void* mymalloc(size_t size, char* file, int line){
         }else{
             //iterate till you find metadata that fits for your use
                 while(meta->next != NULL){
-                        printf("next:%p\n", meta);
+                       // printf("next:%p\n", meta);
                         //traverse until you find an unused chunk or the end of meta chain
                         if(meta->isUsed == 0 && meta->isManaging > size + sizeof(metadata)){
                             //found a spot

@@ -13,12 +13,12 @@ void testF();
 
 int main(int argv, char* argc[]){
     srand(123);
-  //  testA();
-   // testB();
-    //testC();
-   // testD();
+    testA();
+    testB();
+    testC();
+    testD();
     testE();
-    //testF();
+    testF();
 }
 
 
@@ -216,21 +216,38 @@ void testF(){
 			array[mallocs] = (char*) malloc(96);
 
 		}
+		printf("allocated all array space \n");
 		free((void*)lol);
 		free((void*)meep);
+		char ** p = array;
+		printf("running random free test\n");
 		for(k=0;k<10;k++){
-			free(array[k]+k);
+			free(p+k);
 			free(&lol+k);
+			free(array+k);
 		}
+		printf("gonna free array now \n");
 		/*making the array empty minus the structs that were there*/
 		for(j=0;j<32;j++){
 			free(array[j]);
+			if(j>15){
+				for(k=0;k<10;k++){
+					/*just attempting to free unused blocks*/
+					free(p+k);
+				}
+			}
 		}
+		printf("actually freed entire array\n");
+		p = array;
 		free((void*)lol);
 		free((void*)meep);
 		for(k=0;k<10;k++){
-			free(array[k]+k);
+			free(p+k);
 			free(&lol+k);
+		}
+		printf("attempting to free already freed slots in our array\n");
+		for(k =0; k<30; k++){
+			free(array[k]);
 		}
 
 		gettimeofday(&end,NULL);
