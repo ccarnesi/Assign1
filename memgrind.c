@@ -266,5 +266,5 @@ void findAvg(char* testName, long array[]){
         for(i=0;i<100;i++){
             sum += array[i];
         }
-        printf("The average time for %s is %.6f seconds\n", testName, (float)sum/100);
+        printf("The average time for %s is %.6f micro seconds\n", testName, (float)sum/100);
 }
